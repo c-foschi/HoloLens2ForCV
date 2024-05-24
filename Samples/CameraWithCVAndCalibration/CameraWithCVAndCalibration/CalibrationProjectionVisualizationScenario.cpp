@@ -172,19 +172,19 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
         IResearchModeCameraSensor *pCameraSensor = nullptr;
 
         // Initialize the sample hologram.
-        auto axisRFRenderer = std::make_shared<XYZAxisModel>(m_deviceResources, 0.05f, 0.001f);
+        //auto axisRFRenderer = std::make_shared<XYZAxisModel>(m_deviceResources, 0.05f, 0.001f);
 
         cameraNodeToRigPose = DirectX::XMLoadFloat4x4(&m_RFCameraPose);
         det = XMMatrixDeterminant(cameraNodeToRigPose);
         cameraNodeToRigPoseInverted = DirectX::XMMatrixInverse(&det, cameraNodeToRigPose);
 
-        axisRFRenderer->SetGroupScaleFactor(1.0);
-        axisRFRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
+        //axisRFRenderer->SetGroupScaleFactor(1.0);
+        //axisRFRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
 
-        axisRFRenderer->SetColors(DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),
-            DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),
-            DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f));
-        m_modelRenderers.push_back(axisRFRenderer);
+        //axisRFRenderer->SetColors(DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),
+        //    DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),
+        //    DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f));
+        //m_modelRenderers.push_back(axisRFRenderer);
 
         winrt::check_hresult(m_pRFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
 
@@ -258,20 +258,20 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
         IResearchModeCameraSensor *pCameraSensor = nullptr;
 
         // Initialize the sample hologram.
-        auto axisLFRenderer = std::make_shared<XYZAxisModel>(m_deviceResources, 0.1f, 0.001f);
+        //auto axisLFRenderer = std::make_shared<XYZAxisModel>(m_deviceResources, 0.1f, 0.001f);
 
         cameraNodeToRigPose = DirectX::XMLoadFloat4x4(&m_LFCameraPose);
         det = XMMatrixDeterminant(cameraNodeToRigPose);
         cameraNodeToRigPoseInverted = DirectX::XMMatrixInverse(&det, cameraNodeToRigPose);
 
         //axisLFRenderer->SetOffset(offset);
-        axisLFRenderer->SetGroupScaleFactor(1.0);
-        axisLFRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
+        //axisLFRenderer->SetGroupScaleFactor(1.0);
+        //axisLFRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
 
-        axisLFRenderer->SetColors(DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),
-            DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),
-            DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f));
-        m_modelRenderers.push_back(axisLFRenderer);
+        //axisLFRenderer->SetColors(DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),
+        //    DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),
+        //    DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f));
+        //m_modelRenderers.push_back(axisLFRenderer);
 
 
         winrt::check_hresult(m_pLFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
