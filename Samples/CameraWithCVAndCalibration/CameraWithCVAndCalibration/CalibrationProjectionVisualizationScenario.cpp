@@ -425,6 +425,7 @@ void CalibrationProjectionVisualizationScenario::IntializeModelRendering()
     InitializeArucoRendering();
 }
 
+// repositions all holograms in m_modelRenderers two meters in front of the user
 void CalibrationProjectionVisualizationScenario::PositionHologram(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose, const DX::StepTimer& timer)
 {
     // When a Pressed gesture is detected, the sample hologram will be repositioned
@@ -435,6 +436,7 @@ void CalibrationProjectionVisualizationScenario::PositionHologram(winrt::Windows
     }
 }
 
+// same (no smoothing)
 void CalibrationProjectionVisualizationScenario::PositionHologramNoSmoothing(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose)
 {
     // When a Pressed gesture is detected, the sample hologram will be repositioned
@@ -445,11 +447,13 @@ void CalibrationProjectionVisualizationScenario::PositionHologramNoSmoothing(win
     }
 }
 
+// updates the hologram models. It updates the models' positions, scales, and rotations,
+// and checks if any Aruco markers are present and updates the position and direction of
+// the corresponding holograms.
 void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &timer)
 {
-    DirectX::XMMATRIX groupRotation = DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(1.f, 0.f, 0.f, 0.f), -DirectX::XM_PIDIV2/2);
-
-    groupRotation = XMLoadFloat4x4(&m_groupRotation);
+    //DirectX::XMMATRIX groupRotation = DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(1.f, 0.f, 0.f, 0.f), -DirectX::XM_PIDIV2/2);
+    DirectX::XMMATRIX groupRotation = XMLoadFloat4x4(&m_groupRotation);
 
     for (int i = 0; i < m_modelRenderers.size(); i++)
     {
@@ -470,11 +474,10 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
 
     if (m_arucoDetectorLeft->GetFirstCenter(uv, uv + 1, &timeStamp))
     {
-        HRESULT hr = S_OK;        
-        IResearchModeCameraSensor *pCameraSensor = nullptr;
-        
-        winrt::check_hresult(m_pLFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
+        HRESULT hr = S_OK;
 
+        IResearchModeCameraSensor *pCameraSensor = nullptr;
+        winrt::check_hresult(m_pLFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, x);
 
         m_rayLeft->SetDirection(DirectX::XMFLOAT3(x[0], x[1], 1.0f));
@@ -498,9 +501,7 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
         }
 
         IResearchModeCameraSensor *pCameraSensor = nullptr;
-        
         winrt::check_hresult(m_pRFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
-
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, x);
 
         m_rayRight->SetDirection(DirectX::XMFLOAT3(x[0], x[1], 1.0f));
@@ -514,6 +515,7 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
     }
 }
 
+// renders all holograms in m_modelRenderers
 void CalibrationProjectionVisualizationScenario::RenderModels()
 {
     // Draw the sample hologram.
