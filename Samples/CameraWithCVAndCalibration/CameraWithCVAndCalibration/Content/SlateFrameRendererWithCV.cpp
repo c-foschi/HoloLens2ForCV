@@ -303,7 +303,6 @@ void SlateFrameRendererWithCV::FrameProcessingThread(SlateFrameRendererWithCV* p
     pSlateFrameRendererWithCV->FrameProcessing();
 }
 
-
 void SlateFrameRendererWithCV::StartCVProcessing(BYTE bright)
 {
     m_Width = 200;
