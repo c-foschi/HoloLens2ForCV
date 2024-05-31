@@ -219,7 +219,6 @@
     <ClInclude Include="Content\SpatialInputHandler.h" />
     <ClInclude Include="Content\ShaderStructures.h" />
     <ClInclude Include="Content\ModelRenderer.h" />
-    <ClInclude Include="Content\XYZAxisModel.h" />
     <ClInclude Include="Content\YAxisModel.h" />
     <ClInclude Include="Content\ZAxisModel.h" />
     <ClInclude Include="pch.h" />
@@ -239,7 +238,6 @@
     <ClCompile Include="Content\SlateFrameRendererWithCV.cpp" />
     <ClCompile Include="Content\SpatialInputHandler.cpp" />
     <ClCompile Include="Content\ModelRenderer.cpp" />
-    <ClCompile Include="Content\XYZAxisModel.cpp" />
     <ClCompile Include="Content\YAxisModel.cpp" />
     <ClCompile Include="Content\ZAxisModel.cpp" />
     <ClCompile Include="pch.cpp">

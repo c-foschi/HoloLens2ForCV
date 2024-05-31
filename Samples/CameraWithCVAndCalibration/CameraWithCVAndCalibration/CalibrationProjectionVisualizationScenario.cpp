@@ -168,33 +168,23 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
 
     XMStoreFloat4x4(&m_groupRotation, groupRotation);
 
+    // Initialize left Vector model
     {
         IResearchModeCameraSensor *pCameraSensor = nullptr;
-
-        // Initialize the sample hologram.
-        //auto axisRFRenderer = std::make_shared<XYZAxisModel>(m_deviceResources, 0.05f, 0.001f);
 
         cameraNodeToRigPose = DirectX::XMLoadFloat4x4(&m_RFCameraPose);
         det = XMMatrixDeterminant(cameraNodeToRigPose);
         cameraNodeToRigPoseInverted = DirectX::XMMatrixInverse(&det, cameraNodeToRigPose);
 
-        //axisRFRenderer->SetGroupScaleFactor(1.0);
-        //axisRFRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
-
-        //axisRFRenderer->SetColors(DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),
-        //    DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),
-        //    DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f));
-        //m_modelRenderers.push_back(axisRFRenderer);
-
         winrt::check_hresult(m_pRFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
 
+        std::shared_ptr<VectorModel> vectorOriginRenderer;
+
+#if RENDER_CAMERA_ORIGINS
         uv[0] = 0.0f;
         uv[1] = 0.0f;
-
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
-
-        auto vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
-
+        vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
         vectorOriginRenderer->SetGroupScaleFactor(1.0);
         vectorOriginRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
         vectorOriginRenderer->SetColor(DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
@@ -202,11 +192,8 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
 
         uv[0] = 640.0f;
         uv[1] = 0.0f;
-
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
-
         vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
-
         vectorOriginRenderer->SetGroupScaleFactor(1.0);
         vectorOriginRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
         vectorOriginRenderer->SetColor(DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
@@ -214,11 +201,8 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
 
         uv[0] = 640.0f;
         uv[1] = 480.0f;
-
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
-
         vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
-
         vectorOriginRenderer->SetGroupScaleFactor(1.0);
         vectorOriginRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
         vectorOriginRenderer->SetColor(DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
@@ -226,23 +210,18 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
 
         uv[0] = 0.0f;
         uv[1] = 480.0f;
-
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
-
         vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
-
         vectorOriginRenderer->SetGroupScaleFactor(1.0);
         vectorOriginRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
         vectorOriginRenderer->SetColor(DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
         m_modelRenderers.push_back(vectorOriginRenderer);
+#endif
 
         uv[0] = 640.0f / 2;
         uv[1] = 480.0f / 2;
-
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
-
         vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.6f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
-
         vectorOriginRenderer->SetGroupScaleFactor(1.0);
         vectorOriginRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
         vectorOriginRenderer->SetGroupTransform(groupRotation);
@@ -254,35 +233,23 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
         pCameraSensor->Release();
     }
 
+    // Initialize right Vector model
     {
         IResearchModeCameraSensor *pCameraSensor = nullptr;
-
-        // Initialize the sample hologram.
-        //auto axisLFRenderer = std::make_shared<XYZAxisModel>(m_deviceResources, 0.1f, 0.001f);
 
         cameraNodeToRigPose = DirectX::XMLoadFloat4x4(&m_LFCameraPose);
         det = XMMatrixDeterminant(cameraNodeToRigPose);
         cameraNodeToRigPoseInverted = DirectX::XMMatrixInverse(&det, cameraNodeToRigPose);
 
-        //axisLFRenderer->SetOffset(offset);
-        //axisLFRenderer->SetGroupScaleFactor(1.0);
-        //axisLFRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
-
-        //axisLFRenderer->SetColors(DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f),
-        //    DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),
-        //    DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f));
-        //m_modelRenderers.push_back(axisLFRenderer);
-
-
         winrt::check_hresult(m_pLFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
 
+        std::shared_ptr<VectorModel> vectorOriginRenderer;
+
+#if RENDER_CAMERA_ORIGINS
         uv[0] = 0.0f;
         uv[1] = 0.0f;
-
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
-
-        auto vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
-
+        vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
         vectorOriginRenderer->SetGroupScaleFactor(1.0);
         vectorOriginRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
         vectorOriginRenderer->SetColor(DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
@@ -290,11 +257,8 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
 
         uv[0] = 640.0f;
         uv[1] = 0.0f;
-
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
-
         vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
-
         vectorOriginRenderer->SetGroupScaleFactor(1.0);
         vectorOriginRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
         vectorOriginRenderer->SetColor(DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
@@ -302,11 +266,8 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
 
         uv[0] = 640.0f;
         uv[1] = 480.0f;
-
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
-
         vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
-
         vectorOriginRenderer->SetGroupScaleFactor(1.0);
         vectorOriginRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
         vectorOriginRenderer->SetColor(DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
@@ -314,23 +275,18 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
 
         uv[0] = 0.0f;
         uv[1] = 480.0f;
-
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
-
         vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
-
         vectorOriginRenderer->SetGroupScaleFactor(1.0);
         vectorOriginRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
         vectorOriginRenderer->SetColor(DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
         m_modelRenderers.push_back(vectorOriginRenderer);
+#endif
 
         uv[0] = 640.0f / 2;
         uv[1] = 480.0f / 2;
-
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
-
         vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.6f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
-
         vectorOriginRenderer->SetGroupScaleFactor(1.0);
         vectorOriginRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
         vectorOriginRenderer->SetGroupTransform(groupRotation);
@@ -447,9 +403,6 @@ void CalibrationProjectionVisualizationScenario::PositionHologramNoSmoothing(win
     }
 }
 
-// updates the hologram models. It updates the models' positions, scales, and rotations,
-// and checks if any Aruco markers are present and updates the position and direction of
-// the corresponding holograms.
 void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &timer)
 {
     //DirectX::XMMATRIX groupRotation = DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(1.f, 0.f, 0.f, 0.f), -DirectX::XM_PIDIV2/2);
@@ -472,46 +425,50 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
     float uv[2];
     ResearchModeSensorTimestamp timeStamp;
 
-    if (m_arucoDetectorLeft->GetFirstCenter(uv, uv + 1, &timeStamp))
+    // for each of the two Aruco Detectors (TextureRenderers) rotates the ray in the respective
+    // VectorModel renderer wrt the position of the Aruco marker in the camera frame.
     {
-        HRESULT hr = S_OK;
-
-        IResearchModeCameraSensor *pCameraSensor = nullptr;
-        winrt::check_hresult(m_pLFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
-        pCameraSensor->MapImagePointToCameraUnitPlane(uv, x);
-
-        m_rayLeft->SetDirection(DirectX::XMFLOAT3(x[0], x[1], 1.0f));
-        m_rayLeft->EnableRendering();
-
-        pCameraSensor->Release();
-    }
-    else
-    {
-        m_rayLeft->DisableRendering();
-    }
-
-    if (m_arucoDetectorRight->GetFirstCenter(uv, uv + 1, &timeStamp))
-    {
-        HRESULT hr = S_OK;
-
-        if (m_stationaryReferenceFrame)
+        if (m_arucoDetectorLeft->GetFirstCenter(uv, uv + 1, &timeStamp))
         {
-            SpatialCoordinateSystem currentCoordinateSystem =
-                m_stationaryReferenceFrame.CoordinateSystem();
+            HRESULT hr = S_OK;
+
+            IResearchModeCameraSensor* pCameraSensor = nullptr;
+            winrt::check_hresult(m_pLFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
+            pCameraSensor->MapImagePointToCameraUnitPlane(uv, x);
+
+            m_rayLeft->SetDirection(DirectX::XMFLOAT3(x[0], x[1], 1.0f));
+            m_rayLeft->EnableRendering();
+
+            pCameraSensor->Release();
+        }
+        else
+        {
+            m_rayLeft->DisableRendering();
         }
 
-        IResearchModeCameraSensor *pCameraSensor = nullptr;
-        winrt::check_hresult(m_pRFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
-        pCameraSensor->MapImagePointToCameraUnitPlane(uv, x);
+        if (m_arucoDetectorRight->GetFirstCenter(uv, uv + 1, &timeStamp))
+        {
+            HRESULT hr = S_OK;
 
-        m_rayRight->SetDirection(DirectX::XMFLOAT3(x[0], x[1], 1.0f));
-        m_rayRight->EnableRendering();
+            if (m_stationaryReferenceFrame)
+            {
+                SpatialCoordinateSystem currentCoordinateSystem =
+                    m_stationaryReferenceFrame.CoordinateSystem();
+            }
 
-        pCameraSensor->Release();
-    }
-    else
-    {
-        m_rayRight->DisableRendering();
+            IResearchModeCameraSensor* pCameraSensor = nullptr;
+            winrt::check_hresult(m_pRFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
+            pCameraSensor->MapImagePointToCameraUnitPlane(uv, x);
+
+            m_rayRight->SetDirection(DirectX::XMFLOAT3(x[0], x[1], 1.0f));
+            m_rayRight->EnableRendering();
+
+            pCameraSensor->Release();
+        }
+        else
+        {
+            m_rayRight->DisableRendering();
+        }
     }
 }
 
