@@ -212,15 +212,12 @@
     <ClInclude Include="Common\CameraResources.h" />
     <ClInclude Include="Common\StepTimer.h" />
     <ClInclude Include="Content\VectorModel.h" />
-    <ClInclude Include="Content\XAxisModel.h" />
     <ClInclude Include="Content\OpenCVFrameProcessing.h" />
     <ClInclude Include="Content\SlateCameraRenderer.h" />
     <ClInclude Include="Content\SlateFrameRendererWithCV.h" />
     <ClInclude Include="Content\SpatialInputHandler.h" />
     <ClInclude Include="Content\ShaderStructures.h" />
     <ClInclude Include="Content\ModelRenderer.h" />
-    <ClInclude Include="Content\YAxisModel.h" />
-    <ClInclude Include="Content\ZAxisModel.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="researchmode\ResearchModeApi.h" />
     <ClInclude Include="Texture2D.h" />
@@ -232,14 +229,11 @@
     <ClCompile Include="Common\DeviceResources.cpp" />
     <ClCompile Include="Common\CameraResources.cpp" />
     <ClCompile Include="Content\VectorModel.cpp" />
-    <ClCompile Include="Content\XAxisModel.cpp" />
     <ClCompile Include="Content\OpenCVFrameProcessing.cpp" />
     <ClCompile Include="Content\SlateCameraRenderer.cpp" />
     <ClCompile Include="Content\SlateFrameRendererWithCV.cpp" />
     <ClCompile Include="Content\SpatialInputHandler.cpp" />
     <ClCompile Include="Content\ModelRenderer.cpp" />
-    <ClCompile Include="Content\YAxisModel.cpp" />
-    <ClCompile Include="Content\ZAxisModel.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
