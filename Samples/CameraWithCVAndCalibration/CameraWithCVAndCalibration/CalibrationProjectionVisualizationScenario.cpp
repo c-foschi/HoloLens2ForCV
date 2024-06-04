@@ -168,6 +168,11 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
 
     XMStoreFloat4x4(&m_groupRotation, groupRotation);
 
+    //Initialize test cube
+    auto cube = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.1f, DirectX::XMFLOAT3(0, 0, 1.0f));
+    m_modelRenderers.push_back(cube);
+
+
     // Initialize left Vector model
     {
         IResearchModeCameraSensor *pCameraSensor = nullptr;

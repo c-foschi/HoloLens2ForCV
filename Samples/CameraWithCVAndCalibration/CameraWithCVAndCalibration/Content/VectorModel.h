@@ -13,13 +13,8 @@
 
 #include "..\Common\DeviceResources.h"
 #include "..\Common\StepTimer.h"
-#include "researchmode\ResearchModeApi.h"
 #include "ShaderStructures.h"
 #include "ModelRenderer.h"
-#include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>  // cv::Canny()
-#include <opencv2/aruco.hpp>
-#include <opencv2/core/mat.hpp>
 
 namespace BasicHologram
 {
