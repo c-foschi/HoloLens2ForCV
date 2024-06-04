@@ -211,6 +211,7 @@
     <ClInclude Include="Common\DirectXHelper.h" />
     <ClInclude Include="Common\CameraResources.h" />
     <ClInclude Include="Common\StepTimer.h" />
+    <ClInclude Include="Content\ModelEnsemble.h" />
     <ClInclude Include="Content\VectorModel.h" />
     <ClInclude Include="Content\OpenCVFrameProcessing.h" />
     <ClInclude Include="Content\SlateCameraRenderer.h" />
@@ -228,6 +229,7 @@
     <ClCompile Include="CalibrationProjectionVisualizationScenario.cpp" />
     <ClCompile Include="Common\DeviceResources.cpp" />
     <ClCompile Include="Common\CameraResources.cpp" />
+    <ClCompile Include="Content\ModelEnsemble.cpp" />
     <ClCompile Include="Content\VectorModel.cpp" />
     <ClCompile Include="Content\OpenCVFrameProcessing.cpp" />
     <ClCompile Include="Content\SlateCameraRenderer.cpp" />
