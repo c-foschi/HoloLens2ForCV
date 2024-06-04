@@ -180,7 +180,7 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
 
         std::shared_ptr<VectorModel> vectorOriginRenderer;
 
-#if RENDER_CAMERA_ORIGINS
+#ifdef RENDER_CAMERA_ORIGINS
         uv[0] = 0.0f;
         uv[1] = 0.0f;
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
@@ -245,7 +245,7 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
 
         std::shared_ptr<VectorModel> vectorOriginRenderer;
 
-#if RENDER_CAMERA_ORIGINS
+#ifdef RENDER_CAMERA_ORIGINS
         uv[0] = 0.0f;
         uv[1] = 0.0f;
         pCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
