@@ -137,20 +137,6 @@ void CalibrationProjectionVisualizationScenario::IntializeSensors()
 
 void CalibrationProjectionVisualizationScenario::UpdateState()
 {
-    m_state++;
-
-    DirectX::XMMATRIX groupRotation = DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(1.f, 0.f, 0.f, 0.f), -DirectX::XM_PIDIV2/2);
-    groupRotation = groupRotation * DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(0.f, 1.f, 0.f, 0.f), (-DirectX::XM_PIDIV2 / 2 + (DirectX::XM_PIDIV2 / 8 * m_state)));
-
-    XMStoreFloat4x4(&m_groupRotation, groupRotation);
-
-    for (int i = 0; i < m_modelRenderers.size(); i++)
-    {
-        if (m_modelRenderers[i]->IsAxisModel())
-        {
-            m_modelRenderers[i]->SetGroupTransform(groupRotation);
-        }
-    }
 }
 
 void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRendering()
@@ -165,8 +151,6 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
 
     DirectX::XMMATRIX groupRotation = DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(1.f, 0.f, 0.f, 0.f), -DirectX::XM_PIDIV2/2);
     groupRotation = groupRotation * DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(0.f, 1.f, 0.f, 0.f), (-DirectX::XM_PIDIV2 / 2 + (DirectX::XM_PIDIV2 / 4 * m_state)));
-
-    XMStoreFloat4x4(&m_groupRotation, groupRotation);
 
     //Initialize test cube
     auto cube = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.1f, DirectX::XMFLOAT3(0, 0, 1.0f));
@@ -411,20 +395,9 @@ void CalibrationProjectionVisualizationScenario::PositionHologramNoSmoothing(win
 
 void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &timer)
 {
-    //DirectX::XMMATRIX groupRotation = DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(1.f, 0.f, 0.f, 0.f), -DirectX::XM_PIDIV2/2);
-    DirectX::XMMATRIX groupRotation = XMLoadFloat4x4(&m_groupRotation);
-
     for (int i = 0; i < m_modelRenderers.size(); i++)
     {
         m_modelRenderers[i]->Update(timer);
-    }
-
-    for (int i = 0; i < m_modelRenderers.size(); i++)
-    {
-        if (m_modelRenderers[i]->IsAxisModel())
-        {
-            m_modelRenderers[i]->SetGroupTransform(groupRotation);
-        }
     }
 
     float x[2];
@@ -510,7 +483,7 @@ void CalibrationProjectionVisualizationScenario::PositionCube(winrt::Windows::UI
         const float3 up = pointerPose.Head().UpDirection();
         const float3 right = cross(forward, up);
 
-        const float3 goTo = headPosition + forward + right/3;
+        const float3 goTo = headPosition + 2*forward - right/3;
         m_red_cube->SetPosition(goTo);
     }
 }

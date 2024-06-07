@@ -54,8 +54,6 @@ namespace BasicHologram
         DirectX::XMFLOAT4X4 m_RFCameraRotation;
         DirectX::XMFLOAT4 m_RFRotDeterminant;
 
-        DirectX::XMFLOAT4X4 m_groupRotation;
-
         std::vector<std::shared_ptr<ModelRenderer>> m_modelRenderers;
         std::shared_ptr<VectorModel> m_rayLeft;
         std::shared_ptr<VectorModel> m_rayRight;
