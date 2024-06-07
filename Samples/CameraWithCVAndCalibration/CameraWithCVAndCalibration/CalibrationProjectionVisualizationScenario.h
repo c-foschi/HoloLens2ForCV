@@ -24,6 +24,7 @@ namespace BasicHologram
         void UpdateModels(DX::StepTimer &timer);
         void PositionHologram(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose, const DX::StepTimer& timer);
         void PositionHologramNoSmoothing(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose);
+        void PositionCube(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose);
         winrt::Windows::Foundation::Numerics::float3 const& GetPosition()
         {
             return m_modelRenderers[0]->GetPosition();
@@ -58,6 +59,7 @@ namespace BasicHologram
         std::vector<std::shared_ptr<ModelRenderer>> m_modelRenderers;
         std::shared_ptr<VectorModel> m_rayLeft;
         std::shared_ptr<VectorModel> m_rayRight;
+        std::shared_ptr<VectorModel> m_red_cube;
 
         std::shared_ptr<SlateFrameRendererWithCV> m_arucoDetectorLeft;
         std::shared_ptr<SlateFrameRendererWithCV> m_arucoDetectorRight;

@@ -171,7 +171,7 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
     //Initialize test cube
     auto cube = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.1f, DirectX::XMFLOAT3(0, 0, 1.0f));
     m_modelRenderers.push_back(cube);
-
+    m_red_cube = cube;
 
     // Initialize left Vector model
     {
@@ -406,6 +406,7 @@ void CalibrationProjectionVisualizationScenario::PositionHologramNoSmoothing(win
     {
         m_modelRenderers[i]->PositionHologramNoSmoothing(pointerPose);
     }
+    PositionCube(pointerPose);
 }
 
 void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &timer)
@@ -474,6 +475,43 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
         {
             m_rayRight->DisableRendering();
         }
+    }
+
+    /*
+    // if both cameras see the target, place the cube
+    if (double_detection)
+    {
+        float x_m = (x_l[0] + x_r[0]) / 2;
+        float y_m = (x_l[1] + x_r[1]) / 2;
+        float z = 40;
+
+        // estimate z only if it comes out lesser than 40
+        if (float d_x = x_r[0] - x_l[0] > 1 / 40)
+        {
+            z = 1 / d_x;
+        }
+        //m_red_cube->EnableRendering();
+        //m_red_cube->SetPosition(float3(x_m*20, y_m*20, z*20));
+        m_red_cube->SetPosition(float3(1.f, 0.f, 0.f));
+    }
+    else
+        //m_red_cube->DisableRendering();
+        m_red_cube->SetPosition(float3(0.f, 0.f, 0.f));
+    */
+}
+
+void CalibrationProjectionVisualizationScenario::PositionCube(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose)
+{
+    if (pointerPose != nullptr)
+    {
+        // Get the gaze direction relative to the given coordinate system.
+        const float3 headPosition = pointerPose.Head().Position();
+        const float3 forward = pointerPose.Head().ForwardDirection();
+        const float3 up = pointerPose.Head().UpDirection();
+        const float3 right = cross(forward, up);
+
+        const float3 goTo = headPosition + forward + right/3;
+        m_red_cube->SetPosition(goTo);
     }
 }
 
