@@ -395,22 +395,24 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
         m_modelRenderers[i]->Update(timer);
     }
 
-    float x[2];
-    float uv[2];
-    ResearchModeSensorTimestamp timeStamp;
-
     // for each of the two Aruco Detectors (TextureRenderers) rotates the ray in the respective
     // VectorModel renderer wrt the position of the Aruco marker in the camera frame.
     {
+        float x_l[2];
+        float x_r[2];
+        float uv[2];
+        ResearchModeSensorTimestamp timeStamp;
+        bool double_detection = true;
+
         if (m_arucoDetectorLeft->GetFirstCenter(uv, uv + 1, &timeStamp))
         {
             HRESULT hr = S_OK;
 
             IResearchModeCameraSensor* pCameraSensor = nullptr;
             winrt::check_hresult(m_pLFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
-            pCameraSensor->MapImagePointToCameraUnitPlane(uv, x);
+            pCameraSensor->MapImagePointToCameraUnitPlane(uv, x_l);
 
-            m_rayLeft->SetDirection(DirectX::XMFLOAT3(x[0], x[1], 1.0f));
+            m_rayLeft->SetDirection(DirectX::XMFLOAT3(x_l[0], x_l[1], 1.0f));
             m_rayLeft->EnableRendering();
 
             pCameraSensor->Release();
@@ -418,6 +420,7 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
         else
         {
             m_rayLeft->DisableRendering();
+            double_detection = false;
         }
 
         if (m_arucoDetectorRight->GetFirstCenter(uv, uv + 1, &timeStamp))
@@ -432,9 +435,9 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
 
             IResearchModeCameraSensor* pCameraSensor = nullptr;
             winrt::check_hresult(m_pRFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
-            pCameraSensor->MapImagePointToCameraUnitPlane(uv, x);
+            pCameraSensor->MapImagePointToCameraUnitPlane(uv, x_r);
 
-            m_rayRight->SetDirection(DirectX::XMFLOAT3(x[0], x[1], 1.0f));
+            m_rayRight->SetDirection(DirectX::XMFLOAT3(x_r[0], x_r[1], 1.0f));
             m_rayRight->EnableRendering();
 
             pCameraSensor->Release();
@@ -442,30 +445,29 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
         else
         {
             m_rayRight->DisableRendering();
+            double_detection = false;
         }
-    }
 
-    /*
-    // if both cameras see the target, place the cube
-    if (double_detection)
-    {
-        float x_m = (x_l[0] + x_r[0]) / 2;
-        float y_m = (x_l[1] + x_r[1]) / 2;
-        float z = 40;
-
-        // estimate z only if it comes out lesser than 40
-        if (float d_x = x_r[0] - x_l[0] > 1 / 40)
+        // if both cameras see the target, place the cube
+        if (false)
         {
-            z = 1 / d_x;
+            float x_m = (x_l[0] + x_r[0]) / 2;
+            float y_m = (x_l[1] + x_r[1]) / 2;
+            float z = 40;
+
+            // estimate z only if it comes out lesser than 40
+            if (float d_x = x_r[0] - x_l[0] > 1 / 40)
+            {
+                z = 1 / d_x;
+            }
+            //m_red_cube->EnableRendering();
+            //m_red_cube->SetPosition(float3(x_m*20, y_m*20, z*20));
+            m_red_cube->SetPosition(float3(1.f, 0.f, 0.f));
         }
-        //m_red_cube->EnableRendering();
-        //m_red_cube->SetPosition(float3(x_m*20, y_m*20, z*20));
-        m_red_cube->SetPosition(float3(1.f, 0.f, 0.f));
+        //else
+            //m_red_cube->DisableRendering();
+            //m_red_cube->SetPosition(float3(0.f, 0.f, 0.f));
     }
-    else
-        //m_red_cube->DisableRendering();
-        m_red_cube->SetPosition(float3(0.f, 0.f, 0.f));
-    */
 }
 
 void CalibrationProjectionVisualizationScenario::PositionCube(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose)
