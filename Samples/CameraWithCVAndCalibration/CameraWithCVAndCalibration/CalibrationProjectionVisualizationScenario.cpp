@@ -149,9 +149,6 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
     float xy[2] = {0};
     float uv[2];
 
-    DirectX::XMMATRIX groupRotation = DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(1.f, 0.f, 0.f, 0.f), -DirectX::XM_PIDIV2/2);
-    groupRotation = groupRotation * DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(0.f, 1.f, 0.f, 0.f), (-DirectX::XM_PIDIV2 / 2 + (DirectX::XM_PIDIV2 / 4 * m_state)));
-
     //Initialize test cube
     auto cube = std::make_shared<VectorModel>(m_deviceResources, 0.1f, 0.1f, DirectX::XMFLOAT3(0, 0, 1.0f));
     m_modelRenderers.push_back(cube);
@@ -213,7 +210,6 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
         vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.6f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
         vectorOriginRenderer->SetGroupScaleFactor(1.0);
         vectorOriginRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
-        vectorOriginRenderer->SetGroupTransform(groupRotation);
         vectorOriginRenderer->SetColor(DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
         m_modelRenderers.push_back(vectorOriginRenderer);
 
@@ -278,7 +274,6 @@ void CalibrationProjectionVisualizationScenario::IntializeSensorFrameModelRender
         vectorOriginRenderer = std::make_shared<VectorModel>(m_deviceResources, 0.6f, 0.0005f, DirectX::XMFLOAT3(xy[0], xy[1], 1.0f));
         vectorOriginRenderer->SetGroupScaleFactor(1.0);
         vectorOriginRenderer->SetModelTransform(cameraNodeToRigPoseInverted);
-        vectorOriginRenderer->SetGroupTransform(groupRotation);
         vectorOriginRenderer->SetColor(DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
         m_modelRenderers.push_back(vectorOriginRenderer);
 
