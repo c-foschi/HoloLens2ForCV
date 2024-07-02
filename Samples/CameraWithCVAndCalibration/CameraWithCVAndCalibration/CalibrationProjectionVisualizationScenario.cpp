@@ -15,6 +15,11 @@
 
 #include "content\OpenCVFrameProcessing.h"
 
+#include <iostream>
+#include <fstream>
+#include <ctime>
+#include <ppltasks.h> // For concurrency::create_task
+
 extern "C"
 HMODULE LoadLibraryA(
     LPCSTR lpLibFileName
@@ -293,12 +298,6 @@ void CalibrationProjectionVisualizationScenario::InitializeArucoRendering()
             // Initialize the sample hologram.
             auto slateCameraRenderer = std::make_shared<SlateCameraRenderer>(m_deviceResources, m_pLFCameraSensor, camConsentGiven, &camAccessCheck);
 
-            float3 offset;
-            offset.x = -0.2f;
-            offset.y = 0.2f;
-            offset.z = 0.0f;
-
-            slateCameraRenderer->SetOffset(offset);
             slateCameraRenderer->DisableRendering();
             m_modelRenderers.push_back(slateCameraRenderer);
 
@@ -308,12 +307,7 @@ void CalibrationProjectionVisualizationScenario::InitializeArucoRendering()
         auto slateTextureRenderer = std::make_shared<SlateFrameRendererWithCV>(m_deviceResources, ProcessRmFrameWithAruco);
         slateTextureRenderer->StartCVProcessing(0xff);
 
-        float3 offset;
-        offset.x = -0.2f;
-        offset.y = -0.2f;
-        offset.z = -0.4f;
-
-        slateTextureRenderer->SetOffset(offset);
+        slateTextureRenderer->DisableRendering();
         m_modelRenderers.push_back(slateTextureRenderer);
         m_arucoDetectorLeft = slateTextureRenderer;
 
@@ -328,12 +322,6 @@ void CalibrationProjectionVisualizationScenario::InitializeArucoRendering()
             // Initialize the sample hologram.
             auto slateCameraRenderer = std::make_shared<SlateCameraRenderer>(m_deviceResources, m_pRFCameraSensor, camConsentGiven, &camAccessCheck);
 
-            float3 offset;
-            offset.x = -0.2f;
-            offset.y = 0.2f;
-            offset.z = 0.0f;
-
-            slateCameraRenderer->SetOffset(offset);
             slateCameraRenderer->DisableRendering();
             m_modelRenderers.push_back(slateCameraRenderer);
 
@@ -343,12 +331,7 @@ void CalibrationProjectionVisualizationScenario::InitializeArucoRendering()
         auto slateTextureRenderer = std::make_shared<SlateFrameRendererWithCV>(m_deviceResources, ProcessRmFrameWithAruco);
         slateTextureRenderer->StartCVProcessing(0xff);
 
-        float3 offset;
-        offset.x = 0.2f;
-        offset.y = -0.2f;
-        offset.z = -0.4f;
-
-        slateTextureRenderer->SetOffset(offset);
+        slateTextureRenderer->DisableRendering();
         slateTextureRenderer->SetModelTransform(DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(1.f, 0.f, 0.f, 0.f), DirectX::XM_PI) * 
                                                 DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(0.f, 1.f, 0.f, 0.f), DirectX::XM_PI));
         m_modelRenderers.push_back(slateTextureRenderer);
@@ -356,7 +339,6 @@ void CalibrationProjectionVisualizationScenario::InitializeArucoRendering()
 
         pRFSlateCameraRenderer->SetFrameCallBack(SlateFrameRendererWithCV::FrameReadyCallback, slateTextureRenderer.get());
     }
-
 }
 
 void CalibrationProjectionVisualizationScenario::IntializeModelRendering()
@@ -388,6 +370,26 @@ void CalibrationProjectionVisualizationScenario::PositionHologramNoSmoothing(win
     PositionCube(pointerPose);
 }
 
+winrt::fire_and_forget CalibrationProjectionVisualizationScenario::WriteToFile(float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8) {
+    auto localFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
+
+    // Get the file, or create it if it doesn't exist
+    winrt::Windows::Storage::StorageFile file = co_await localFolder.CreateFileAsync(L"pixel log.txt", winrt::Windows::Storage::CreationCollisionOption::OpenIfExists);
+
+    // Get the current timestamp
+    std::time_t result = std::time(nullptr);
+    std::string timestamp = std::asctime(std::localtime(&result));
+    timestamp.pop_back(); // Remove the newline character from the end of the timestamp
+
+    // Write to the file
+    std::ofstream myfile(file.Path().c_str(), std::ios::app);
+    myfile << timestamp;
+    myfile << ", " << f1 << ", " << f2 << ", " << f3 << ", " << f4;
+    myfile << ", " << f5 << ", " << f6 << ", " << f7 << ", " << f8;
+    myfile << "\n";
+    myfile.close();
+};
+
 void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &timer)
 {
     for (int i = 0; i < m_modelRenderers.size(); i++)
@@ -400,17 +402,18 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
     {
         float x_l[2];
         float x_r[2];
-        float uv[2];
+        float uv_l[2];
+        float uv_r[2];
         ResearchModeSensorTimestamp timeStamp;
         bool double_detection = true;
 
-        if (m_arucoDetectorLeft->GetFirstCenter(uv, uv + 1, &timeStamp))
+        if (m_arucoDetectorLeft->GetFirstCenter(uv_l, uv_l + 1, &timeStamp))
         {
             HRESULT hr = S_OK;
 
             IResearchModeCameraSensor* pCameraSensor = nullptr;
             winrt::check_hresult(m_pLFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
-            pCameraSensor->MapImagePointToCameraUnitPlane(uv, x_l);
+            pCameraSensor->MapImagePointToCameraUnitPlane(uv_l, x_l);
 
             m_rayLeft->SetDirection(DirectX::XMFLOAT3(x_l[0], x_l[1], 1.0f));
             m_rayLeft->EnableRendering();
@@ -423,19 +426,16 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
             double_detection = false;
         }
 
-        if (m_arucoDetectorRight->GetFirstCenter(uv, uv + 1, &timeStamp))
+        if (m_arucoDetectorRight->GetFirstCenter(uv_r, uv_r + 1, &timeStamp))
         {
             HRESULT hr = S_OK;
 
             if (m_stationaryReferenceFrame)
-            {
-                SpatialCoordinateSystem currentCoordinateSystem =
-                    m_stationaryReferenceFrame.CoordinateSystem();
-            }
+                SpatialCoordinateSystem currentCoordinateSystem = m_stationaryReferenceFrame.CoordinateSystem();
 
             IResearchModeCameraSensor* pCameraSensor = nullptr;
             winrt::check_hresult(m_pRFCameraSensor->QueryInterface(IID_PPV_ARGS(&pCameraSensor)));
-            pCameraSensor->MapImagePointToCameraUnitPlane(uv, x_r);
+            pCameraSensor->MapImagePointToCameraUnitPlane(uv_r, x_r);
 
             m_rayRight->SetDirection(DirectX::XMFLOAT3(x_r[0], x_r[1], 1.0f));
             m_rayRight->EnableRendering();
@@ -449,20 +449,13 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
         }
 
         // if both cameras see the target, place the cube
-        if (false)
+        if (double_detection)
         {
-            float x_m = (x_l[0] + x_r[0]) / 2;
-            float y_m = (x_l[1] + x_r[1]) / 2;
-            float z = 40;
+            WriteToFile(uv_l[0], uv_l[1], uv_r[0], uv_r[1], x_l[0], x_l[1], x_r[0], x_r[1]);
 
-            // estimate z only if it comes out lesser than 40
-            if (float d_x = x_r[0] - x_l[0] > 1 / 40)
-            {
-                z = 1 / d_x;
-            }
             //m_red_cube->EnableRendering();
             //m_red_cube->SetPosition(float3(x_m*20, y_m*20, z*20));
-            m_red_cube->SetPosition(float3(1.f, 0.f, 0.f));
+            //m_red_cube->SetPosition(float3(1.f, 0.f, 0.f));
         }
         //else
             //m_red_cube->DisableRendering();
