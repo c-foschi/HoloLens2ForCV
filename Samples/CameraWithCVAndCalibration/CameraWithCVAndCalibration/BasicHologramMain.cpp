@@ -179,11 +179,12 @@ HolographicFrame BasicHologramMain::Update()
             {
                 pose = pointerState.TryGetPointerPose(m_stationaryReferenceFrame.CoordinateSystem());
                 m_scenario->UpdateState();
+
+                // When a Pressed gesture is detected, the sample hologram will be repositioned
+                // two meters in front of the user.
+                m_scenario->PositionHologramNoSmoothing(pose);
             }
 
-            // When a Pressed gesture is detected, the sample hologram will be repositioned
-            // two meters in front of the user.
-            m_scenario->PositionHologramNoSmoothing(pose);
 		}
     }
     else
@@ -352,7 +353,6 @@ bool BasicHologramMain::Render(HolographicFrame const& holographicFrame)
             // Attach the view/projection constant buffer for this camera to the graphics pipeline.
             bool cameraActive = pCameraResources->AttachViewProjectionBuffer(m_deviceResources);
 
-#ifdef DRAW_SAMPLE_CONTENT
             // Only render world-locked content when positional tracking is active.
             if (cameraActive)
             {
@@ -374,7 +374,6 @@ bool BasicHologramMain::Render(HolographicFrame const& holographicFrame)
                     renderingParameters.CommitDirect3D11DepthBuffer(interopSurface);
                 }
             }
-#endif
             atLeastOneCameraRendered = true;
         }
 
