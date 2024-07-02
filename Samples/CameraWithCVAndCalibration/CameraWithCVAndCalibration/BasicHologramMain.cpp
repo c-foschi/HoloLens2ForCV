@@ -170,7 +170,7 @@ HolographicFrame BasicHologramMain::Update()
         {
             SpatialInteractionSourceState pointerState = m_spatialInputHandler->CheckForInput();
 
-            if (m_fFirstUpdate)
+            if (m_fFirstUpdate) // only run once
             {
                 pose = SpatialPointerPose::TryGetAtTimestamp(m_stationaryReferenceFrame.CoordinateSystem(), prediction.Timestamp());
                 m_fFirstUpdate = false;
@@ -188,6 +188,10 @@ HolographicFrame BasicHologramMain::Update()
     }
     else
     {
+        // because m_fUseWorldSpace is set to true right at class initialization, I don't
+        // suppose this block of code is ever run... which means m_inputCount is never
+        // changed (it's never used anyway) and PositionHologram is never used.
+
         SpatialInteractionSourceState pointerState = m_spatialInputHandler->CheckForInput();
         if (pointerState != nullptr)
         {
@@ -207,43 +211,32 @@ HolographicFrame BasicHologramMain::Update()
         m_scenario->PositionHologram(pose, m_timer);
     }
 
-    // When a Pressed gesture is detected, the sample hologram will be repositioned
-    // two meters in front of the user.
-
-
     m_timer.Tick([this]()
     {
-        //
-        // TODO: Update scene objects.
-        //
         // Put time-based updates here. By default this code will run once per frame,
         // but if you change the StepTimer to use a fixed time step this code will
         // run as many times as needed to get to the current step.
-        //
-
-#ifdef DRAW_SAMPLE_CONTENT
-        m_scenario->UpdateModels(m_timer);
         
-#endif
+        m_scenario->UpdateModels(m_timer);
     });
-    if (!m_canCommitDirect3D11DepthBuffer)
+
+    if (!m_canCommitDirect3D11DepthBuffer & 0) // TO BE ASSESSED
     {
         // On versions of the platform that do not support the CommitDirect3D11DepthBuffer API, we can control
         // image stabilization by setting a focus point with optional plane normal and velocity.
         for (HolographicCameraPose const& cameraPose : prediction.CameraPoses())
         {
-#ifdef DRAW_SAMPLE_CONTENT
             // The HolographicCameraRenderingParameters class provides access to set
             // the image stabilization parameters.
             HolographicCameraRenderingParameters renderingParameters = holographicFrame.GetRenderingParameters(cameraPose);
 
             // SetFocusPoint informs the system about a specific point in your scene to
             // prioritize for image stabilization. The focus point is set independently
-                // for each holographic camera. When setting the focus point, put it on or 
-                // near content that the user is looking at.
-                // In this example, we put the focus point at the center of the sample hologram.
-                // You can also set the relative velocity and facing of the stabilization
-                // plane using overloads of this method.
+            // for each holographic camera. When setting the focus point, put it on or 
+            // near content that the user is looking at.
+            // In this example, we put the focus point at the center of the sample hologram.
+            // You can also set the relative velocity and facing of the stabilization
+            // plane using overloads of this method.
             if (m_attachedReferenceFrame != nullptr)
             {
                 SpatialCoordinateSystem currentCoordinateSystem = 
@@ -254,7 +247,6 @@ HolographicFrame BasicHologramMain::Update()
                     m_scenario->GetPosition()
                 );
             }
-#endif
         }
     }
 
