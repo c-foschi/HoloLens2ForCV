@@ -24,6 +24,7 @@ namespace BasicHologram
         void UpdateModels(DX::StepTimer &timer);
         void PositionHologram(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose, const DX::StepTimer& timer);
         void PositionHologramNoSmoothing(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose);
+        void PositionCube(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose);
         winrt::Windows::Foundation::Numerics::float3 const& GetPosition()
         {
             return m_modelRenderers[0]->GetPosition();
@@ -36,6 +37,8 @@ namespace BasicHologram
         virtual void UpdateState();
 
     protected:
+
+        winrt::fire_and_forget WriteToFile(float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8);
 
         void IntializeSensorFrameModelRendering();
         void InitializeArucoRendering();
@@ -53,11 +56,10 @@ namespace BasicHologram
         DirectX::XMFLOAT4X4 m_RFCameraRotation;
         DirectX::XMFLOAT4 m_RFRotDeterminant;
 
-        DirectX::XMFLOAT4X4 m_groupRotation;
-
         std::vector<std::shared_ptr<ModelRenderer>> m_modelRenderers;
         std::shared_ptr<VectorModel> m_rayLeft;
         std::shared_ptr<VectorModel> m_rayRight;
+        std::shared_ptr<VectorModel> m_red_cube;
 
         std::shared_ptr<SlateFrameRendererWithCV> m_arucoDetectorLeft;
         std::shared_ptr<SlateFrameRendererWithCV> m_arucoDetectorRight;
