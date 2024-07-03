@@ -448,7 +448,7 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
     // if both cameras see the target, place the cube
     if (double_detection)
     {
-        WriteToFile(uv_l[0], uv_l[1], uv_r[0], uv_r[1], x_l[0], x_l[1], x_r[0], x_r[1]);
+        //WriteToFile(uv_l[0], uv_l[1], uv_r[0], uv_r[1], x_l[0], x_l[1], x_r[0], x_r[1]);
 
         //m_red_cube->EnableRendering();
         //m_red_cube->SetPosition(float3(x_m*20, y_m*20, z*20));
@@ -461,17 +461,10 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
 
 void CalibrationProjectionVisualizationScenario::PositionCube(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose)
 {
-    if (pointerPose != nullptr)
-    {
-        // Get the gaze direction relative to the given coordinate system.
-        const float3 headPosition = pointerPose.Head().Position();
-        const float3 forward = pointerPose.Head().ForwardDirection();
-        const float3 up = pointerPose.Head().UpDirection();
-        const float3 right = cross(forward, up);
-
-        const float3 goTo = headPosition + 2*forward - right/3;
-        m_red_cube->SetPosition(goTo);
-    }
+    // funziona ma male:
+    //m_red_cube->SetPositionRelativeToHead(float3 { .33, 0., 2. });
+    // funziona bene:
+    m_red_cube->SetPositionRelativeToHead(pointerPose.Head(), float3{ .33, 0., 2. });
 }
 
 // renders all holograms in m_modelRenderers

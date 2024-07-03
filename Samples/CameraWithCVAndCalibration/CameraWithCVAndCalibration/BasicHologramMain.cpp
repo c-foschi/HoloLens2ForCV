@@ -184,7 +184,6 @@ HolographicFrame BasicHologramMain::Update()
                 // two meters in front of the user.
                 m_scenario->PositionHologramNoSmoothing(pose);
             }
-
 		}
     }
     else
@@ -221,7 +220,8 @@ HolographicFrame BasicHologramMain::Update()
         m_scenario->UpdateModels(m_timer);
     });
 
-    if (!m_canCommitDirect3D11DepthBuffer & 0) // TO BE ASSESSED
+    // TO BE ASSESSED
+    if (!m_canCommitDirect3D11DepthBuffer & 0)
     {
         // On versions of the platform that do not support the CommitDirect3D11DepthBuffer API, we can control
         // image stabilization by setting a focus point with optional plane normal and velocity.

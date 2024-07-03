@@ -37,6 +37,9 @@ namespace BasicHologram
         void PositionHologram(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose, const DX::StepTimer& timer);
         void PositionHologramNoSmoothing(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose);
 
+        void SetPositionRelativeToHead(winrt::Windows::Perception::People::HeadPose headPose, winrt::Windows::Foundation::Numerics::float3 const& position);
+        void SetPositionRelativeToHead(winrt::Windows::Foundation::Numerics::float3 position);
+
         // Property accessors.
         void SetPosition(winrt::Windows::Foundation::Numerics::float3 const& pos)   { m_position = pos;  }
         winrt::Windows::Foundation::Numerics::float3 const& GetPosition()           { return m_position; }

@@ -77,6 +77,34 @@ void ModelRenderer::PositionHologramNoSmoothing(SpatialPointerPose const& pointe
     }
 }
 
+void ModelRenderer::SetPositionRelativeToHead(winrt::Windows::Perception::People::HeadPose headPose, float3 const& position)
+{
+    const float3 headPos = headPose.Position();
+    const float3 forward = headPose.ForwardDirection();
+    const float3 up = headPose.UpDirection();
+    const float3 right = cross(forward, up);
+    float3 hologramPos = headPos + right * position.x + up * position.y + forward * position.z;
+    SetPosition(hologramPos);
+}
+
+void ModelRenderer::SetPositionRelativeToHead(float3 position)
+{
+    // this whole block is for retrieving the HeadPose
+    auto spatialLocator = winrt::Windows::Perception::Spatial::SpatialLocator::GetDefault();
+    auto currentTimestamp = winrt::Windows::Perception::PerceptionTimestampHelper::FromHistoricalTargetTime(winrt::Windows::Foundation::DateTime::clock::now());
+    auto currentStationaryFrameOfReference = spatialLocator.CreateStationaryFrameOfReferenceAtCurrentLocation();
+    auto coordinateSystem = currentStationaryFrameOfReference.CoordinateSystem();
+    auto pointerPose = winrt::Windows::UI::Input::Spatial::SpatialPointerPose::TryGetAtTimestamp(coordinateSystem, currentTimestamp);
+    
+    if (pointerPose == nullptr)
+    {
+        SetPosition(float3::zero());
+        return;
+    }
+
+    SetPositionRelativeToHead(pointerPose.Head(), position);
+}
+
 // Called once per frame. Rotates the cube, and calculates and sets the model matrix
 // relative to the position transform indicated by hologramPositionTransform.
 void ModelRenderer::Update(DX::StepTimer const& timer)
