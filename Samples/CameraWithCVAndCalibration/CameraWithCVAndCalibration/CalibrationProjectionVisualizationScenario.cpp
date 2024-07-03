@@ -368,7 +368,7 @@ void CalibrationProjectionVisualizationScenario::PositionHologramNoSmoothing(win
     PositionCube(pointerPose);
 }
 
-winrt::fire_and_forget CalibrationProjectionVisualizationScenario::WriteToFile(float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8) {
+winrt::fire_and_forget CalibrationProjectionVisualizationScenario::WriteToFile(float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8, float f9) {
     auto localFolder = winrt::Windows::Storage::ApplicationData::Current().LocalFolder();
 
     // Get the file, or create it if it doesn't exist
@@ -384,7 +384,7 @@ winrt::fire_and_forget CalibrationProjectionVisualizationScenario::WriteToFile(f
     myfile << timestamp;
     myfile << ", " << f1 << ", " << f2 << ", " << f3 << ", " << f4;
     myfile << ", " << f5 << ", " << f6 << ", " << f7 << ", " << f8;
-    myfile << "\n";
+    myfile << ", " << f9 << "\n";
     myfile.close();
 };
 
@@ -448,7 +448,15 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
     // if both cameras see the target, place the cube
     if (double_detection)
     {
-        //WriteToFile(uv_l[0], uv_l[1], uv_r[0], uv_r[1], x_l[0], x_l[1], x_r[0], x_r[1]);
+        // compute the distance to target using stereoscopic vision:
+        float pixel_shift_x = uv_l[0] - 640.f + uv_r[0];
+        float pixel_shift_y = uv_l[1] - 480.f + uv_r[1];
+        float pixel_shift = sqrt(pixel_shift_x * pixel_shift_x + pixel_shift_y * pixel_shift_y);
+        if (pixel_shift < 19)
+            pixel_shift = 19.f;
+        float distance = 108.f * (1.f / pixel_shift) - .84f;
+        WriteToFile(uv_l[0], uv_l[1], uv_r[0], uv_r[1], x_l[0], x_l[1], x_r[0], x_r[1], distance);
+        m_red_cube->SetPositionRelativeToHead(m_stationaryReferenceFrame.CoordinateSystem(), x_l[0], x_l[1], distance);
 
         //m_red_cube->EnableRendering();
         //m_red_cube->SetPosition(float3(x_m*20, y_m*20, z*20));
@@ -461,10 +469,9 @@ void CalibrationProjectionVisualizationScenario::UpdateModels(DX::StepTimer &tim
 
 void CalibrationProjectionVisualizationScenario::PositionCube(winrt::Windows::UI::Input::Spatial::SpatialPointerPose const& pointerPose)
 {
-    // funziona ma male:
-    //m_red_cube->SetPositionRelativeToHead(float3 { .33, 0., 2. });
-    // funziona bene:
-    m_red_cube->SetPositionRelativeToHead(pointerPose.Head(), float3{ .33, 0., 2. });
+    // funzionano entrambi, ma il primo non necessita del pointerPose:
+    m_red_cube->SetPositionRelativeToHead(m_stationaryReferenceFrame.CoordinateSystem(), float3{ .33f, 0.f, 2.f });
+    //m_red_cube->SetPositionRelativeToHead(pointerPose.Head(), float3{ .33, 0., 2. });
 }
 
 // renders all holograms in m_modelRenderers

@@ -33,78 +33,6 @@ ModelRenderer::ModelRenderer(std::shared_ptr<DX::DeviceResources> const& deviceR
     m_fGroupScale = 1.0f;
 }
 
-// This function uses a SpatialPointerPose to position the world-locked hologram
-// two meters in front of the user's heading.
-void ModelRenderer::PositionHologram(SpatialPointerPose const& pointerPose, const DX::StepTimer& timer)
-{
-    const float& deltaTime = static_cast<float>(timer.GetElapsedSeconds());
-
-    if (pointerPose != nullptr)
-    {
-        // Get the gaze direction relative to the given coordinate system.
-        const float3 headPosition = pointerPose.Head().Position();
-        const float3 headDirection = pointerPose.Head().ForwardDirection();
-
-        constexpr float distanceFromUser = 1.0f; // meters
-        const float3 gazeAtTwoMeters = headPosition + (distanceFromUser * headDirection);
-
-        // Use linear interpolation to smooth the position over time. This keeps the hologram 
-        // comfortably stable.
-        const float3 smoothedPosition = lerp(m_position, gazeAtTwoMeters, deltaTime * 4.0f);
-
-        // This will be used as the translation component of the hologram's
-        // model transform.
-        SetPosition(smoothedPosition);
-    }
-}
-
-// This function uses a SpatialPointerPose to position the world-locked hologram
-// two meters in front of the user's heading.
-void ModelRenderer::PositionHologramNoSmoothing(SpatialPointerPose const& pointerPose)
-{
-    if (pointerPose != nullptr)
-    {
-        // Get the gaze direction relative to the given coordinate system.
-        const float3 headPosition = pointerPose.Head().Position();
-        const float3 headDirection = pointerPose.Head().ForwardDirection();
-
-        constexpr float distanceFromUser = 1.0f; // meters
-        const float3 gazeAtTwoMeters = headPosition + (distanceFromUser * headDirection);
-
-        // This will be used as the translation component of the hologram's
-        // model transform.
-        SetPosition(gazeAtTwoMeters);
-    }
-}
-
-void ModelRenderer::SetPositionRelativeToHead(winrt::Windows::Perception::People::HeadPose headPose, float3 const& position)
-{
-    const float3 headPos = headPose.Position();
-    const float3 forward = headPose.ForwardDirection();
-    const float3 up = headPose.UpDirection();
-    const float3 right = cross(forward, up);
-    float3 hologramPos = headPos + right * position.x + up * position.y + forward * position.z;
-    SetPosition(hologramPos);
-}
-
-void ModelRenderer::SetPositionRelativeToHead(float3 position)
-{
-    // this whole block is for retrieving the HeadPose
-    auto spatialLocator = winrt::Windows::Perception::Spatial::SpatialLocator::GetDefault();
-    auto currentTimestamp = winrt::Windows::Perception::PerceptionTimestampHelper::FromHistoricalTargetTime(winrt::Windows::Foundation::DateTime::clock::now());
-    auto currentStationaryFrameOfReference = spatialLocator.CreateStationaryFrameOfReferenceAtCurrentLocation();
-    auto coordinateSystem = currentStationaryFrameOfReference.CoordinateSystem();
-    auto pointerPose = winrt::Windows::UI::Input::Spatial::SpatialPointerPose::TryGetAtTimestamp(coordinateSystem, currentTimestamp);
-    
-    if (pointerPose == nullptr)
-    {
-        SetPosition(float3::zero());
-        return;
-    }
-
-    SetPositionRelativeToHead(pointerPose.Head(), position);
-}
-
 // Called once per frame. Rotates the cube, and calculates and sets the model matrix
 // relative to the position transform indicated by hologramPositionTransform.
 void ModelRenderer::Update(DX::StepTimer const& timer)
@@ -404,4 +332,86 @@ void ModelRenderer::ReleaseDeviceDependentResources()
     m_modelConstantBuffer.Reset();
     m_vertexBuffer.Reset();
     m_indexBuffer.Reset();
+}
+
+
+///// METHODS FOR MOVING HOLOGRAM
+
+
+// This function uses a SpatialPointerPose to position the world-locked hologram
+// two meters in front of the user's heading.
+void ModelRenderer::PositionHologram(SpatialPointerPose const& pointerPose, const DX::StepTimer& timer)
+{
+    const float& deltaTime = static_cast<float>(timer.GetElapsedSeconds());
+
+    if (pointerPose != nullptr)
+    {
+        // Get the gaze direction relative to the given coordinate system.
+        const float3 headPosition = pointerPose.Head().Position();
+        const float3 headDirection = pointerPose.Head().ForwardDirection();
+
+        constexpr float distanceFromUser = 1.0f; // meters
+        const float3 gazeAtTwoMeters = headPosition + (distanceFromUser * headDirection);
+
+        // Use linear interpolation to smooth the position over time. This keeps the hologram 
+        // comfortably stable.
+        const float3 smoothedPosition = lerp(m_position, gazeAtTwoMeters, deltaTime * 4.0f);
+
+        // This will be used as the translation component of the hologram's
+        // model transform.
+        SetPosition(smoothedPosition);
+    }
+}
+
+// This function uses a SpatialPointerPose to position the world-locked hologram
+// two meters in front of the user's heading.
+void ModelRenderer::PositionHologramNoSmoothing(SpatialPointerPose const& pointerPose)
+{
+    if (pointerPose != nullptr)
+    {
+        // Get the gaze direction relative to the given coordinate system.
+        const float3 headPosition = pointerPose.Head().Position();
+        const float3 headDirection = pointerPose.Head().ForwardDirection();
+
+        constexpr float distanceFromUser = 1.0f; // meters
+        const float3 gazeAtTwoMeters = headPosition + (distanceFromUser * headDirection);
+
+        // This will be used as the translation component of the hologram's
+        // model transform.
+        SetPosition(gazeAtTwoMeters);
+    }
+}
+
+void ModelRenderer::SetPositionRelativeToHead(winrt::Windows::Perception::People::HeadPose headPose, float3 const& position)
+{
+    const float3 headPos = headPose.Position();
+    const float3 forward = headPose.ForwardDirection();
+    const float3 up = headPose.UpDirection();
+    const float3 right = cross(forward, up);
+    float3 hologramPos = headPos + right * position.x + up * position.y + forward * position.z;
+    SetPosition(hologramPos);
+}
+
+void ModelRenderer::SetPositionRelativeToHead(winrt::Windows::Perception::Spatial::SpatialCoordinateSystem frame, float3 position)
+{
+    auto currentTimestamp = winrt::Windows::Perception::PerceptionTimestampHelper::FromHistoricalTargetTime(winrt::Windows::Foundation::DateTime::clock::now());
+    auto pointerPose = winrt::Windows::UI::Input::Spatial::SpatialPointerPose::TryGetAtTimestamp(frame, currentTimestamp);
+
+    if (pointerPose == nullptr)
+    {
+        SetPosition(float3::zero());
+        return;
+    }
+
+    SetPositionRelativeToHead(pointerPose.Head(), position);
+}
+
+// yaw and pitch are the radians for the direction at which to put the hologram,
+// starting from head position and orientation
+void ModelRenderer::SetPositionRelativeToHead(winrt::Windows::Perception::Spatial::SpatialCoordinateSystem frame, float yaw, float pitch, float distance)
+{
+    float x = sin(yaw);
+    float y = sin(pitch);
+    float z = sqrt(1.f - x * x - y * y);
+    SetPositionRelativeToHead(frame, float3{ x, y, z } * distance);
 }
